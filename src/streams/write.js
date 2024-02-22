@@ -1,18 +1,14 @@
-const read = async () => {
+const write = async () => {
   try {
-    const filePath = 'fileToRead.txt';
-    const readStream = createReadStream(filePath, { encoding: 'utf-8' });
+    const filePath = 'fileToWrite.txt';
+    const writeStream = createWriteStream(filePath, { encoding: 'utf-8' });
 
-    readStream.on('data', (chunk) => {
-      process.stdout.write(chunk);
-    });
+    process.stdin.pipe(writeStream);
 
-    readStream.on('end', () => {
-      console.log('File reading completed.');
-    });
+    console.log('Enter data to write (Press Ctrl+D to finish):');
   } catch (error) {
-    console.error('Error reading file:', error);
+    console.error('Error writing to file:', error);
   }
 };
 
-await read();
+await write();
