@@ -1,40 +1,27 @@
-const path = require('path');
-const { release, version } = require('os');
-const { createServer: createServerHttp } = require('http');
-require('./files/c');
+// esm.mjs
 
-const random = Math.random();
+import { promises as fs } from 'fs';
 
-let unknownObject;
+const { readFile, writeFile } = fs;
 
-if (random > 0.5) {
-    unknownObject = require('./files/a.json');
-} else {
-    unknownObject = require('./files/b.json');
-}
+const convertCjsToEsm = async (cjsFilePath, esmFilePath) => {
+  try {
 
-console.log(`Release ${release()}`);
-console.log(`Version ${version()}`);
-console.log(`Path segment separator is "${path.sep}"`);
+    const cjsContent = await readFile(cjsFilePath, 'utf-8');
 
-console.log(`Path to current file is ${__filename}`);
-console.log(`Path to current directory is ${__dirname}`);
+  
+    const esmContent = `
+      ${cjsContent}
+      export default module.exports;
+    `;
 
-const myServer = createServerHttp((_, res) => {
-    res.end('Request accepted');
-});
+    // Write the content to the ESM file
+    await writeFile(esmFilePath, esmContent, 'utf-8');
 
-const PORT = 3000;
-
-console.log(unknownObject);
-
-myServer.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
-    console.log('To terminate it, use Ctrl+C combination');
-});
-
-module.exports = {
-    unknownObject,
-    myServer,
+    console.log('CJS to ESM conversion successful!');
+  } catch (error) {
+    console.error('Conversion failed:', error);
+  }
 };
 
+export default convertCjsToEsm;
